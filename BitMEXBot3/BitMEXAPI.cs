@@ -6,6 +6,8 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace BitMEX
 {
@@ -170,6 +172,21 @@ namespace BitMEX
             param["orderID"] = "de709f12-2f24-9a36-b047-ab0ff090f0bb";
             param["text"] = "cancel order by ID";
             return Query("DELETE", "/order", param, true, true);
+        }
+
+        public Quote GetQuote(Dictionary<string, string> param = null)
+        {
+            if (param == null)
+            {
+                param = new Dictionary<string, string>();
+                param["symbol"] = "XBTUSD";
+                param["count"] = 1.ToString();
+                param["reverse"] = true.ToString();
+            }
+
+            var result = Query("GET", "/quote", param, true);
+
+            return JsonConvert.DeserializeObject<List<Quote>>(result).First();
         }
 
         private byte[] hmacsha256(byte[] keyByte, byte[] messageBytes)
